@@ -1,11 +1,11 @@
-import { Button, InputGroup, Col, Dropdown, DropdownButton, FloatingLabel, FormControl, Row } from 'react-bootstrap';
-import { createTheme } from '@mui/material/styles';
-import { ThemeProvider } from '@material-ui/styles';
+import { Button, InputGroup, Col, Dropdown, DropdownButton, FloatingLabel, Form, FormControl, Row } from 'react-bootstrap';
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import React, { Component } from 'react';
 import MomentFnsUtils from '@date-io/moment';
 import moment from 'moment';
 import api from '../api/';
+import Popup from '../molecules/Popup';
+import { ErrorDescription, ErrorTitle, SuccessDescription, SuccessTitle } from '../constants';
 
 class BookVisit extends Component {
 
@@ -21,6 +21,11 @@ class BookVisit extends Component {
             lastName: '',
             mobileNo: '',
             email: '',
+            isValid: false,
+            isShown: false,
+            popupMsgCode: '',
+            popupTitle: '',
+            popupDesc: '',
             visitTypes: []
         }
         this.handleVisitTypeSelect = this.handleVisitTypeSelect.bind(this);
@@ -32,6 +37,11 @@ class BookVisit extends Component {
         this.handleMobileNoChange = this.handleMobileNoChange.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.setIsShown = this.setIsShown.bind(this);
+        this.setOnHide = this.setOnHide.bind(this);
+        this.setIsValid = this.setIsValid.bind(this);
+        this.setClearForm = this.setClearForm.bind(this);
     }
 
     handleVisitTypeSelect = async (visitTypeValue) => {
@@ -77,8 +87,35 @@ class BookVisit extends Component {
         this.setState({ email: emailValue.target.value });
     }
 
-    handleSubmit = async () => {
+    setIsValid() {
+        this.setState({ isValid: true});
+    }
+
+    setClearForm() {
+        this.setState({ isValid: false});
+    }
+
+    setIsShown() {
+        this.setState({ isShown: true });
+    }
+
+    setOnHide(showModal) {
+        this.setState({ isShown: showModal });
+    }
+
+    handleSubmit = async (event) => {
         const { visitTypeId, numVisitors, visitDate, visitTime, firstName, lastName, mobileNo, email } = this.state;
+        const form = event.currentTarget;
+
+        // if (form.checkValidity() === false) {
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        // }
+
+        event.preventDefault();
+        event.stopPropagation();
+        
+        this.setIsValid();
         var dateTime = moment(visitDate + ' ' + visitTime);
         
         const payload = {
@@ -97,7 +134,6 @@ class BookVisit extends Component {
 
         await api.createVisit(payload)
                  .then(res => {
-                    window.alert('success');
                     this.setState({
                         visitType: '',
                         visitTypeId: '',
@@ -107,8 +143,18 @@ class BookVisit extends Component {
                         firstName: '',
                         lastName: '',
                         mobileNo: '',
-                        email: ''
-                    })
+                        email: '',
+                        popupDesc: SuccessDescription.SUCC_BOOK_DESC,
+                        popupTitle: SuccessTitle.SUCC_BOOK_TITLE
+                    }, this.setIsShown(), this.setClearForm())
+                 })
+                 .catch (err => {
+                    if (err.response.status === 400) {
+                        this.setState({
+                            popupDesc: ErrorDescription.ERR_BOOK_DESC,
+                            popupTitle: ErrorTitle.ERR_BOOK_TITLE
+                        }, this.setIsShown());
+                    }
                  })
     }
 
@@ -127,7 +173,7 @@ class BookVisit extends Component {
     }
 
     render() {
-        const { visitTypes } = this.state;
+        const { visitTypes, isShown, popupDesc, popupTitle } = this.state;
         return (
             <div>
                 {/* Component -- Create Appt */}
@@ -143,6 +189,10 @@ class BookVisit extends Component {
                                 <p>MobileNo: {this.state?.mobileNo ? this.state.mobileNo : "No value"}</p>
                                 <p>Email: {this.state?.email ? this.state.email : "No value"}</p>
                                 <p>VisitTypes: {this.state?.visitTypes ? "has Value" : "No value"}</p>
+                                <p>IsValid (form): {this.state?.isValid ? this.state.isValid.toString() : "false"}</p>
+                                <p>IsShown (modal): {this.state?.isShown ? this.state.isShown.toString() : "false"}</p>
+                                <p>ErrorMessage (modal): {this.state?.popupMsgCode ? this.state.popupMsgCode : "No value"}</p>
+
                 </div>
                 <div className="section  whiteBkg mt-4">
                     <Row>
@@ -156,6 +206,7 @@ class BookVisit extends Component {
                         <Col lg={6}>
                             <div>
                                 <h2 className="mt-3">visit details</h2>
+                                <Form id="MyForm" noValidate validated={this.state.isValid} onSubmit={this.handleSubmit}>
                                 <InputGroup className="mt-3">
                                     <DropdownButton
                                         variant="outline-secondary"
@@ -163,11 +214,10 @@ class BookVisit extends Component {
                                         id="visitTypeDropdown"
                                         onSelect={this.handleVisitTypeSelect}
                                         >
-                                            {visitTypes.map(this.populateVisitTypes)}
-                                        {/* <Dropdown.Item eventKey="Cat visit">Cat visit</Dropdown.Item>
-                                        <Dropdown.Item eventKey="Kitten visit">Kitten visit</Dropdown.Item> */}
+                                        {visitTypes.map(this.populateVisitTypes)}
                                     </DropdownButton>
-                                    <FormControl aria-label="VisitTypeValue" value={this.state.visitType} />
+                                    <Form.Control required name="VisitTypeValue" aria-label="VisitTypeValue" value={this.state.visitType} />
+                                    <Form.Control.Feedback type="invalid">Visit type is required.</Form.Control.Feedback>
                                 </InputGroup>
 
                                 <InputGroup className="mt-3">
@@ -184,7 +234,8 @@ class BookVisit extends Component {
                                         <Dropdown.Item eventKey="5">5</Dropdown.Item>
                                         <Dropdown.Item eventKey="6">6</Dropdown.Item>
                                     </DropdownButton>
-                                    <FormControl aria-label="NumberOfVisitorsValue" value={this.state.numVisitors} />
+                                    <Form.Control required aria-label="NumberOfVisitorsValue" value={this.state.numVisitors} />
+                                    <Form.Control.Feedback type="invalid">Number of visitors is required.</Form.Control.Feedback>
                                 </InputGroup>
 
                                 <InputGroup className="mt-3">
@@ -214,28 +265,35 @@ class BookVisit extends Component {
                                         <Dropdown.Item eventKey="15:00">15:00</Dropdown.Item>
                                         <Dropdown.Item eventKey="16:00">16:00</Dropdown.Item>
                                     </DropdownButton>
-                                    <FormControl aria-label="VisitTimeValue" value={this.state.visitTime} />
+                                    <Form.Control required aria-label="VisitTimeValue" value={this.state.visitTime} />
                                 </InputGroup>
 
                                 <h2 className="mt-5">contact details</h2>
 
                                 <FloatingLabel controlId="floatingFirstName" label="First Name">
-                                    <FormControl type="text" placeholder="firstName" value={this.state.firstName} onChange={this.handleFirstNameChange}/>
+                                    <Form.Control required type="text" placeholder="firstName" value={this.state.firstName} onChange={this.handleFirstNameChange}/>
+                                    <Form.Control.Feedback type="invalid">First name is required.</Form.Control.Feedback>
                                 </FloatingLabel>
                                 <FloatingLabel controlId="floatingLastName" label="Last Name" className="mt-3">
-                                    <FormControl type="text" placeholder="lastName" value={this.state.lastName} onChange={this.handleLastNameChange}/>
+                                    <Form.Control required type="text" placeholder="lastName" value={this.state.lastName} onChange={this.handleLastNameChange}/>
+                                    <Form.Control.Feedback type="invalid">Last name is required.</Form.Control.Feedback>
                                 </FloatingLabel>
 
                                 <FloatingLabel controlId="floatingMobileNo" label="Mobile no." className="mt-3">
-                                    <FormControl type="text" placeholder="mobileNo" value={this.state.mobileNo} onChange={this.handleMobileNoChange}/>
+                                    <Form.Control required type="text" placeholder="mobileNo" value={this.state.mobileNo} onChange={this.handleMobileNoChange}/>
+                                    <Form.Control.Feedback type="invalid">Mobile number is required.</Form.Control.Feedback>
                                 </FloatingLabel>
                                 <FloatingLabel controlId="floatingEmail" label="Email" className="mt-3">
-                                    <FormControl type="text" placeholder="email" value={this.state.email} type="email" onChange={this.handleEmailChange}/>
+                                    <Form.Control required type="text" placeholder="email" value={this.state.email} type="email" onChange={this.handleEmailChange}/>
+                                    <Form.Control.Feedback type="invalid">Email is required.</Form.Control.Feedback>
                                 </FloatingLabel>
 
                                 <h2 className="mt-5">add-ons</h2>
 
-                                <Button className="kcButton mt-3" onClick={this.handleSubmit} >Submit</Button>
+                                <Button type="submit" className="kcButton mt-3">Submit</Button>
+                                <Popup show={isShown} onHide={() => this.setOnHide(false)} popupTitle={popupTitle} popupDesc={popupDesc}/>
+                                </Form>
+                                
                             </div>
                         </Col>
                     </Row>

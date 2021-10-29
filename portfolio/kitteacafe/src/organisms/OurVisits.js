@@ -2,7 +2,7 @@ import { Button, Col, Dropdown, DropdownButton, FormControl, InputGroup, Modal, 
 import api from '../api';
 import React, { Component } from 'react';
 import moment from 'moment';
-import VisitStatus from '../constants';
+import { VisitStatus } from '../constants';
 
 class OurVisits extends Component {
     constructor(props) {
