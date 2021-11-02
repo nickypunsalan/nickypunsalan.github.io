@@ -18,7 +18,8 @@ class Popup extends Component {
                   <Modal.Title>{this.props.popupTitle}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  {this.props.popupDesc} 
+                  {this.props.popupDesc ? this.props.popupDesc.map(desc => <p>{desc}</p>) : "Test"}
+
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="primary" onClick={this.props.onHide}>Close</Button>

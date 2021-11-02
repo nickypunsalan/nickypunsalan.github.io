@@ -126,14 +126,12 @@ class OurVisits extends Component {
 
     isVisitToday(visitId, date) {
         var isCurrentDate = moment(date).startOf('day').isSame(moment().startOf('day'));
-        return isCurrentDate ? (<i class="bi-person-check icon" onClick={() => this.handleAttendVisit(visitId)}></i>) : '';
+        return isCurrentDate ? (<i className="bi-person-check icon" onClick={() => this.handleAttendVisit(visitId)}></i>) : '';
     }
 
     populateTableData(visit, index) {
         const date = moment(visit.VisitDateTime).format('DD MMM YYYY hh:mm A');
         var visitType = '';
-
-        console.log("VisitType: ", this.state.visitTypes);
 
         this.state.visitTypes.forEach(vt => {
             if (visit.VisitTypeId === vt._id) {
