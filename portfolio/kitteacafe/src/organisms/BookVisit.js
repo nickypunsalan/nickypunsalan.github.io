@@ -6,8 +6,18 @@ import moment from 'moment';
 import api from '../api/';
 import Popup from '../molecules/Popup';
 import { ErrorDescription, ErrorTitle, SuccessDescription, SuccessTitle } from '../constants';
+import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 
 import Validator from '../validators/BookVisitFormValidator';
+
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#8ab073',
+            contrastText: '#FFFFFF'
+        },
+    }
+});
 
 class BookVisit extends Component {
 
@@ -51,6 +61,7 @@ class BookVisit extends Component {
         this.setClearForm = this.setClearForm.bind(this);
     }
 
+// #region functions
     handleVisitTypeSelect = async (visitTypeValue) => {
         const { visitTypes } = this.state;
 
@@ -243,6 +254,8 @@ class BookVisit extends Component {
         )
     }
 
+    //#endregion
+
     render() {
         const { visitTypes, isShown, popupDesc, popupTitle } = this.state;
         return (
@@ -314,6 +327,7 @@ class BookVisit extends Component {
 
                                     <InputGroup className="mt-3">
                                         <MuiPickersUtilsProvider utils={MomentFnsUtils}>
+                                            <ThemeProvider theme={theme}>
                                             <DatePicker
                                                 variant="inline"
                                                 label="Visit Date"
@@ -323,6 +337,7 @@ class BookVisit extends Component {
                                                 disablePast
                                                 autoOk
                                             />
+                                            </ThemeProvider>
                                         </MuiPickersUtilsProvider>
                                         <DropdownButton
                                             variant="outline-secondary"

@@ -22,7 +22,8 @@ class Popup extends Component {
 
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="primary" onClick={this.props.onHide}>Close</Button>
+                  <Button variant="secondary" onClick={this.props.onHide}>Close</Button>
+                  {this.props.isConfirmationPopup && (<Button className="kcButton" onClick={this.props.onConfirm}>OK</Button>)}
                 </Modal.Footer>
               </Modal>
             </>

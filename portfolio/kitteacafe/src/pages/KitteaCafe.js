@@ -8,17 +8,17 @@ function KitteaCafe() {
     <div className="greyBkg">
 
       <Container fluid className="welcomeSection d-flex align-items-center">
-        <Col xxl={12}>
+        <Col lg={12}>
           <span className="welcomeHeader">kittea cafe</span>
         </Col>
       </Container>
 
       <Container fluid>
         <Row>
-          <Col xxl={5}>
+          <Col lg={5}>
             <OurVisits />
           </Col>
-          <Col xxl={7}>
+          <Col lg={7}>
             <BookVisit/>
           </Col>
         </Row>

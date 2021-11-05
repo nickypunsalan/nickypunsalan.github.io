@@ -7,11 +7,15 @@ const VisitStatus = {
 };
 
 const SuccessTitle = {
-    SUCC_BOOK_TITLE: "Visit created!"
+    SUCC_BOOK_TITLE: "Visit created!",
+    SUCC_CANCEL_TITLE: "Visit cancelled!",
+    SUCC_ATTEND_TITLE: "Visit attended!"
 }
 
 const SuccessDescription = {
-    SUCC_BOOK_DESC: "Visit will now appear in the visit list."
+    SUCC_BOOK_DESC: "Visit will now appear in the visit list.",
+    SUCC_CANCEL_DESC: "Visit has now been cancelled from the visit list.",
+    SUCC_ATTEND_DESC: "Visit has now been marked as attended on the visit list."
 }
 
 const ErrorCode = {
@@ -32,9 +36,15 @@ const ErrorDescription = {
     ERR_BOOK_DESC: "Please review the information inputted in the form."
 }
 
-const WarningCode = {
-    WARN_CANCEL: "Cancelling a visit",
-    WARN_ATTEND: "Marking visit as attended"
+const WarningTitle = {
+    WARN_CANCEL_TITLE: "Cancelling a visit",
+    WARN_ATTEND_TITLE: "Marking as Attended"
 }
 
-export { VisitStatus, ErrorCode, ErrorDescription, ErrorTitle, SuccessTitle, SuccessDescription, WarningCode };
+const WarningDescription = {
+    WARN_CANCEL_DESC: "You are about to cancel this visit. Please confirm before doing so.",
+    WARN_ATTEND_DESC: "You are about to mark this visit as attended. Please confirm before doing so."
+}
+
+export { VisitStatus, ErrorCode, ErrorDescription, ErrorTitle, SuccessTitle, SuccessDescription, WarningTitle,
+WarningDescription };

@@ -1,8 +1,9 @@
-import { Button, Col, Dropdown, DropdownButton, FormControl, InputGroup, Modal, Row, Table } from 'react-bootstrap';
+import { Col, Dropdown, DropdownButton, FormControl, InputGroup, Modal, Row, Table } from 'react-bootstrap';
 import api from '../api';
 import React, { Component } from 'react';
 import moment from 'moment';
-import { VisitStatus } from '../constants';
+import Popup from '../molecules/Popup';
+import { VisitStatus, SuccessTitle, WarningTitle, WarningDescription, SuccessDescription } from '../constants';
 
 class OurVisits extends Component {
     constructor(props) {
@@ -11,27 +12,92 @@ class OurVisits extends Component {
             visits: [],
             columns: [],
             visitTypes: [],
+            visitId: '',
             isLoading: false,
             visitStatus: VisitStatus.STATUS_TODAY,
-            dateToday: ""
+            dateToday: "",
+            confirmationPopupShown: false,
+            cancelSucccessPopupShown: false,
+            attendedPopupShown: false,
+            attendSuccessPopupShown: false,
+            isConfirmed: false,
+            popupTitle: "",
+            popupDesc: []
         }
 
         this.handleCancelVisit = this.handleCancelVisit.bind(this);
         this.handleAttendVisit = this.handleAttendVisit.bind(this);
         this.populateTableData = this.populateTableData.bind(this);
         this.handleVisitStatusSelect = this.handleVisitStatusSelect.bind(this);
+
+        this.setConfirmationPopupShown = this.setConfirmationPopupShown.bind(this);
+        this.setCancelSucccessPopupShown = this.setCancelSucccessPopupShown.bind(this);
+        this.setOnConfirmationHide = this.setOnConfirmationHide.bind(this);
+        this.setOnCancelSuccessHide = this.setOnCancelSuccessHide.bind(this);
+
+        this.setAttendedPopupShown = this.setAttendedPopupShown.bind(this);
+        this.setAttendSuccessPopupShown = this.setAttendSuccessPopupShown.bind(this);
+
+    }
+
+    setOnConfirmationHide(showModal) {
+        this.setState({ confirmationPopupShown: showModal });
+    }
+
+    setOnCancelSuccessHide(showModal) {
+        this.setState({ cancelSucccessPopupShown: showModal });
+    }
+
+    setOnAttendHide(showModal) {
+        this.setState({ attendedPopupShown: showModal  });
+    }
+
+    setOnAttendSuccessHide(showModal) {
+        this.setState({ attendSuccessPopupShown: showModal });
+    }
+
+    setConfirmationPopupShown() {
+        this.setState({ confirmationPopupShown: true});
+    }
+
+    setCancelSucccessPopupShown() {
+        this.setState({ cancelSucccessPopupShown: true});
+    }
+
+    setAttendedPopupShown() {
+        this.setState({ attendedPopupShown: true});
+    }
+
+    setAttendSuccessPopupShown() {
+        this.setState({ attendSuccessPopupShown: true});
     }
 
     handleCancelVisit = async (visitId) => {
-        alert("test: " + visitId);
+        var warnings = [];
+        warnings.push(WarningDescription.WARN_CANCEL_DESC);
+        this.setState({ visitId: visitId, popupTitle: WarningTitle.WARN_CANCEL_TITLE, popupDesc: warnings });
+
+        this.setConfirmationPopupShown();
+
+    }
+
+    cancelVisit = async () => {
+
+        this.setOnConfirmationHide(false);
+
+        var successes = [];
+        successes.push(SuccessDescription.SUCC_CANCEL_DESC);
+
+        this.setState({ popupTitle: SuccessTitle.SUCC_CANCEL_TITLE, popupDesc: successes });
+
         const payload = {
-            VisitId: visitId,
+            VisitId: this.state.visitId,
             Status: VisitStatus.STATUS_CANCELLED
         };
 
-        await api.updateVisitStatus(payload).then(res => {
-            alert(`Visit updated to Cancelled successfully`);
-        })
+        await api.updateVisitStatus(payload).then(res =>{
+            this.setCancelSucccessPopupShown();
+        });
 
         if (this.state.visitStatus === VisitStatus.STATUS_ALL) {
             await api.getAllVisits().then(visits => {
@@ -53,14 +119,31 @@ class OurVisits extends Component {
     }
 
     handleAttendVisit = async (visitId) => {
-        alert("attendVisitTest: " + visitId);
+        
+        var warnings = [];
+        warnings.push(WarningDescription.WARN_ATTEND_DESC);
+
+        this.setState({ visitId: visitId, popupTitle: WarningTitle.WARN_ATTEND_TITLE, popupDesc: warnings });
+
+        this.setAttendedPopupShown();
+    }
+
+    attendVisit = async () => {
+
+        this.setOnAttendHide(false);
+
+        var successes = [];
+        successes.push(SuccessDescription.SUCC_ATTEND_DESC);
+
+        this.setState({ popupTitle: SuccessTitle.SUCC_ATTEND_TITLE, popupDesc: successes });
+
         const payload = {
-            VisitId: visitId,
+            VisitId: this.state.visitId,
             Status: VisitStatus.STATUS_ATTENDED
         };
 
         await api.updateVisitStatus(payload).then(res => {
-            alert(`Visit updated to Attended successfully`);
+            this.setAttendSuccessPopupShown();
         })
 
         if (this.state.visitStatus === VisitStatus.STATUS_ALL) {
@@ -73,7 +156,7 @@ class OurVisits extends Component {
             })
         }
         else {
-            await api.getVisitsByStatus(this.state.visitStatus).then(visits => {
+            await api.getVisitsByStatus(this.state.visitStatus, this.state.dateToday).then(visits => {
                 this.setState({
                     visits: visits.data,
                     isLoading: false
@@ -125,7 +208,7 @@ class OurVisits extends Component {
     }
 
     isVisitToday(visitId, date) {
-        var isCurrentDate = moment(date).startOf('day').isSame(moment().startOf('day'));
+        var isCurrentDate = moment(date).startOf('day').isSameOrBefore(moment().startOf('day'));
         return isCurrentDate ? (<i className="bi-person-check icon" onClick={() => this.handleAttendVisit(visitId)}></i>) : '';
     }
 
@@ -165,34 +248,6 @@ class OurVisits extends Component {
         )
     }
 
-    MyVerticallyCenteredModal(props) {
-        return (
-          <Modal
-            {...props}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-          >
-            <Modal.Header closeButton>
-              <Modal.Title id="contained-modal-title-vcenter">
-                Modal heading
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <h4>Centered Modal</h4>
-              <p>
-                Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-                dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-                consectetur ac, vestibulum at eros.
-              </p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button onClick={props.onHide}>Close</Button>
-            </Modal.Footer>
-          </Modal>
-        );
-      }
-
     render() {
         const { visits } = this.state;
         console.log('VisitsList -> render -> visits', visits);
@@ -216,6 +271,8 @@ class OurVisits extends Component {
                     <p>VisitStatus: {this.state?.visitStatus ? this.state.visitStatus : "No value"}</p>
                     <p>VisitTypes: {this.state?.visitTypes ? "Has value" : "No value"}</p>
                     <p>DateToday: {this.state?.dateToday ? "Has value" : "No value"}</p>
+                    <p>VisitId: {this.state?.visitId ? this.state.visitId : "No value"}</p>
+
                 </div>
                 <div className="section whiteBkg mt-4">
                     <Row>
@@ -257,6 +314,13 @@ class OurVisits extends Component {
                             </Table>
                         </Col>
                     </Row>
+
+                    <Popup isConfirmationPopup={true} show={this.state.confirmationPopupShown} onHide={() => this.setOnConfirmationHide(false)} onConfirm={() => this.cancelVisit()} popupTitle={this.state.popupTitle} popupDesc={this.state.popupDesc} />
+                    <Popup isConfirmationPopup={false} show={this.state.cancelSucccessPopupShown} onHide={() => this.setOnCancelSuccessHide(false)} popupTitle={this.state.popupTitle} popupDesc={this.state.popupDesc} />
+
+                    <Popup isConfirmationPopup={true} show={this.state.attendedPopupShown} onHide={() => this.setOnAttendHide(false)} onConfirm={() => this.attendVisit()} popupTitle={this.state.popupTitle} popupDesc={this.state.popupDesc} />
+                    <Popup isConfirmationPopup={false} show={this.state.attendSuccessPopupShown} onHide={() => this.setOnAttendSuccessHide(false)} popupTitle={this.state.popupTitle} popupDesc={this.state.popupDesc} />
+
                 </div>
             </div>
         )
