@@ -3,15 +3,16 @@
 
 name: Node.js CI
 
-on: [workflow_dispatch]
-  #push:
-   # branches: [ main ]
-    #paths:
-    #- 'portfolio/kitteacafe'
-  #pull_request:
-   # branches: [ main ]
-   # paths:
-    #- 'portfolio/kitteacafe'
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+    - 'portfolio/kitteacafe'
+  pull_request:
+   branches: [ main ]
+   paths:
+   - 'portfolio/kitteacafe'
 jobs:
   build:
 
