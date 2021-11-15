@@ -34,9 +34,11 @@ jobs:
 
       
     - run: npm ci
-      env: ${{ secrets.DB_CONN_STRING }}
+      env:
+        DB_CONN_STRING: ${{ secrets.DB_CONN_STRING }}
       working-directory: portfolio/kitteacafe
     - run: npm run start --if-present
-      env: ${{ secrets.DB_CONN_STRING }}
+      env:
+        DB_CONN_STRING: ${{ secrets.DB_CONN_STRING }}
       working-directory: portfolio/kitteacafe
 #    - run: npm test
