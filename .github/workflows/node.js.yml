@@ -8,11 +8,11 @@ on:
   push:
     branches: [ main ]
     paths:
-    - 'portfolio/kitteacafe'
+    - 'portfolio/kitteacafe/**'
   pull_request:
    branches: [ main ]
    paths:
-   - 'portfolio/kitteacafe'
+   - 'portfolio/kitteacafe/**'
 jobs:
   build:
 
