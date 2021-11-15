@@ -33,5 +33,7 @@ jobs:
         cache-dependency-path: portfolio/kitteacafe/package-lock.json
       
     - run: npm ci
+      working-directory: portfolio/kitteacafe
     - run: npm run start --if-present
+      working-directory: portfolio/kitteacafe
 #    - run: npm test
