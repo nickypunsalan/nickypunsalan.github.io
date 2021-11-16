@@ -50,6 +50,7 @@ jobs:
         path: portfolio/kitteacafe/build
     
     - name: Start server
+      working-directory: portfolio/kitteacafe
       run: npm run backend
 
   deploy:
