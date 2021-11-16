@@ -50,6 +50,8 @@ jobs:
         path: portfolio/kitteacafe/build
     
     - name: Start server
+      env:
+        DB_CONN_STRING: ${{ secrets.DB_CONN_STRING }}
       working-directory: portfolio/kitteacafe
       run: npm run backend
 
