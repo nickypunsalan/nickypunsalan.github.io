@@ -1,4 +1,4 @@
-import { Button, InputGroup, Col, Dropdown, DropdownButton, FloatingLabel, Form, FormControl, Row } from 'react-bootstrap';
+import { Button, InputGroup, Col, Dropdown, DropdownButton, FloatingLabel, Form, Row } from 'react-bootstrap';
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import React, { Component } from 'react';
 import MomentFnsUtils from '@date-io/moment';
@@ -373,7 +373,7 @@ class BookVisit extends Component {
                                         <Form.Control.Feedback type="invalid">{this.state.mobileInvalidMsg}</Form.Control.Feedback>
                                     </FloatingLabel>
                                     <FloatingLabel controlId="floatingEmail" label="Email" className="mt-3">
-                                        <Form.Control required type="text" placeholder="email" isValid={this.state.isEmailValid} isInvalid={this.state.isEmailInvalid} value={this.state.email} type="email" onChange={this.handleEmailChange} />
+                                        <Form.Control required type="email" placeholder="email" isValid={this.state.isEmailValid} isInvalid={this.state.isEmailInvalid} value={this.state.email} onChange={this.handleEmailChange} />
                                         <Form.Control.Feedback type="invalid">{this.state.emailInvalidMsg}</Form.Control.Feedback>
                                     </FloatingLabel>
 

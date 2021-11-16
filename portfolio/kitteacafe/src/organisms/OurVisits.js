@@ -1,4 +1,4 @@
-import { Col, Dropdown, DropdownButton, FormControl, InputGroup, Modal, Row, Table } from 'react-bootstrap';
+import { Col, Dropdown, DropdownButton, FormControl, InputGroup, Row, Table } from 'react-bootstrap';
 import api from '../api';
 import React, { Component } from 'react';
 import moment from 'moment';
@@ -167,7 +167,6 @@ class OurVisits extends Component {
 
     handleVisitStatusSelect = async (visitStatus) => {
         this.setState({ visitStatus: visitStatus });
-        var newDate = moment().startOf('day');
 
         if (visitStatus === VisitStatus.STATUS_ALL) {
             await api.getAllVisits().then(visits => {
