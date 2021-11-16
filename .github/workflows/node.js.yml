@@ -48,6 +48,9 @@ jobs:
       with:
         name: production-files
         path: portfolio/kitteacafe/build
+    
+    - name: Start server
+      run: npm run backend
 
   deploy:
     name: Deploy
