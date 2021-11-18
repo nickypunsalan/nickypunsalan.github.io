@@ -1,3 +1,30 @@
+@media screen and (max-width: 600px) {
+  body {
+    font-size: 4vw !important;
+  }
+
+  .h1 {
+    font-size: 14vw !important;
+  }
+  h2 {
+    font-size: 10vw !important;
+  }
+  h3 {
+    font-size: 8vw !important;
+  }
+  h4, h5 {
+    font-size: 6vw !important;
+  }
+
+  .tag, .tag:hover {
+    font-size: 4vw !important;
+  }
+
+  .smallTag {
+    font-size: 4vw !important;
+  }
+}
+
 body {
     background-color: #3d4247;
     margin: 0 !important;
